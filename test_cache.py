@@ -7,7 +7,7 @@ from tempfile import mkdtemp
 class TestCacheDbMethods(unittest.TestCase):
     def setUp(self):
         dirname = mkdtemp(suffix='caching', prefix='teststorage')
-        self.cache = Db(dirname, 'youtube').__enter__()
+        self.cache = Db(dirname, 'rawcaching').__enter__()
 
     def tearDown(self):
         self.cache.__exit__()
