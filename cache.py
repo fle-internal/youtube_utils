@@ -36,6 +36,6 @@ class Db:
         return self
 
     def __exit__(self):
-        with open(self.db_path + '.cache_stats.txt', 'w') as f:
+        with open(self.db_path + '.cache_stats.json', 'w') as f:
             dump(self.stats(), f)
         self.db.close()
