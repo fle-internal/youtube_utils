@@ -15,7 +15,7 @@ class TestCachingClient(unittest.TestCase):
         current_dir = os.getcwd()
         dirname = os.path.join(current_dir, '.cache', 'cachingclienttests')
         os.makedirs(dirname, exist_ok=True)
-        # print(dirname)
+        print(dirname)
         cls.cache = Db(dirname, 'youtube').__enter__()
         cls.ytd = Client(youtube_dl.YoutubeDL(dict(
             verbose=True,
