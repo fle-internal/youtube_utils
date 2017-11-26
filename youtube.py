@@ -12,9 +12,9 @@ class CachingClient:
         return self._get(lambda x: f'playlist:{x}', id, self.client.get_playlist_data, self._cache_videos)
 
     def get_channel_data(self, id):
-        return self._get(lambda x: f'channel:{x}', id, self.client.get_channel_data, sel._cache_videos)
+        return self._get(lambda x: f'channel:{x}', id, self.client.get_channel_data, self._cache_videos)
 
-    def _get(self, cache_key_gen_func, id, get_func, post_process_func):
+    def _get(self, cache_key_gen_func, id, get_func, post_process_func=None):
         key = cache_key_gen_func(id)
         found, data = self.cache.get(key)
         if not found:
