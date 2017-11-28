@@ -35,13 +35,22 @@ class TestCachingClient(unittest.TestCase):
     def test_get_channel_data(self):
         data = self.caching_client.get_channel_data('UCwYh0qBAF8HyKt0KUMp1rNg')
         self.assertIsNotNone(data)
+        self.assertIsNotNone(data['name'])
+        self.assertIsNotNone(data['videos'])
+        self.assertIsNotNone(data['playlists'])
+        self.assertIsNotNone(data['_raw'])
 
     def test_get_channel_data_twice(self):
         data = self.caching_client.get_channel_data('UCwYh0qBAF8HyKt0KUMp1rNg')
         self.assertIsNotNone(data)
         data = self.caching_client.get_channel_data('UCwYh0qBAF8HyKt0KUMp1rNg')
         self.assertIsNotNone(data)
+        self.assertIsNotNone(data['name'])
+        self.assertIsNotNone(data['videos'])
+        self.assertIsNotNone(data['playlists'])
+        self.assertIsNotNone(data['_raw'])
         stats = self.caching_client.stats()
+        self.assertLessEqual(stats['misses'], 1)
         self.assertGreaterEqual(stats['hits'], 2)
 
 if __name__ == '__main__':
