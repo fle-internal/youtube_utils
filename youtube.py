@@ -13,7 +13,7 @@ class CachingClient:
         return self._get(self._gen_playlist_cache_key, id, self.client.get_playlist_data, self._cache_playlist_parts)
 
     def get_channel_data(self, id):
-        return self._get(self._gen_channel_cache_key, id, self.client.get_channel_data, self._cache_channel_parts)
+        return self._get(self._gen_channel_cache_key, id, self.client.get_channel_data, None)
 
     def _get(self, cache_key_gen_func, id, get_func, further_caching_func):
         key = cache_key_gen_func(id)
@@ -25,9 +25,6 @@ class CachingClient:
                 further_caching_func(data)
         return data
 
-    def _cache_channel_parts(self, enriched_channel):
-        self._cache_playlist_parts(enriched_channel)
-
     def _cache_playlist_parts(self, enriched_playlist):
         playlist = enriched_playlist.get('_raw', {})
         assert playlist.get('_type', None) == 'playlist'
@@ -35,7 +32,7 @@ class CachingClient:
             self._cache_video(entry)
 
     def _cache_video(self, video):
-        self.cache.add(self._gen_video_cache_key(video['id'], video))
+        self.cache.add(self._gen_video_cache_key(video['id']), video)
         return video
 
     def _gen_playlist_cache_key(self, x):
