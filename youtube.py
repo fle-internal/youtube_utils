@@ -13,7 +13,7 @@ class CachingClient:
         return self._get(self._gen_playlist_cache_key, id, self.client.get_playlist_data, self._cache_playlist_parts)
 
     def get_channel_data(self, id):
-        return self._get(self._gen_channel_cache_key, id, self.client.get_channel_data, None)
+        return self._get(self._gen_channel_cache_key, id, self.client.get_channel_data, self._cache_playlist_parts)
 
     def _get(self, cache_key_gen_func, id, get_func, further_caching_func):
         key = cache_key_gen_func(id)

@@ -6,6 +6,7 @@ from cache import Db
 from tempfile import mkdtemp
 from youtube import Client, CachingClient
 import youtube_dl
+import shutil
 
 class TestClient(unittest.TestCase):
     @classmethod
@@ -35,15 +36,15 @@ class TestCachingClient(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         current_dir = os.getcwd()
-        dirname = os.path.join(current_dir, '.cache', 'cachingclienttests')
-        os.makedirs(dirname, exist_ok=True)
-        print(dirname)
-        cls.cache = Db(dirname, 'youtube').__enter__()
+        cls.dirname = os.path.join(current_dir, '.cache', 'cachingclienttests')
+        os.makedirs(TestCachingClient.dirname, exist_ok=True)
+        cls.cache = Db(TestCachingClient.dirname, 'youtube').__enter__()
         cls.ytd = Client(youtube_dl.YoutubeDL(dict(verbose=True)))
 
     @classmethod
     def tearDownClass(cls):
         cls.cache.__exit__()
+        shutil.rmtree(TestCachingClient.dirname)
 
     def setUp(self):
         self.caching_client = CachingClient(TestCachingClient.ytd, TestCachingClient.cache)
@@ -70,36 +71,29 @@ class TestCachingClient(unittest.TestCase):
         self.assertIsNotNone(data['playlists'])
         self.assertIsNotNone(data['_raw'])
         stats = self.caching_client.stats()
-        self.assertLessEqual(stats['misses'], 1)
+        self.assertEqual(stats['misses'], 1)
         self.assertEqual(stats['hits'], 1)
 
-    def test_03_when_video_is_not_cached_misses_increase(self):
-        data = self.caching_client.get_video_data('k23xhJoTbI4')
+    def test_03_when_video_is_cached_hits_increase(self):
+        data = self.caching_client.get_video_data('-0YbKpVbZQM')
         self.assertIsNotNone(data)
         stats = self.caching_client.stats()
-        self.assertLessEqual(stats['misses'], 2)
+        self.assertEqual(stats['misses'], 1)
         self.assertEqual(stats['hits'], 2)
 
-    def test_04_when_video_is_cached_hits_increase(self):
-        data = self.caching_client.get_video_data('k23xhJoTbI4')
-        self.assertIsNotNone(data)
-        stats = self.caching_client.stats()
-        self.assertLessEqual(stats['misses'], 2)
-        self.assertEqual(stats['hits'], 3)
-
-    def test_05_when_playlist_is_not_cached_misses_increase(self):
+    def test_04_when_playlist_is_not_cached_misses_increase(self):
         data = self.caching_client.get_playlist_data('PLn0nrSd4xjjZsAaw5zUHxoRIiPtbQpwoB')
         self.assertIsNotNone(data)
         stats = self.caching_client.stats()
-        self.assertEqual(stats['misses'], 3)
-        self.assertEqual(stats['hits'], 3)
+        self.assertEqual(stats['misses'], 2)
+        self.assertEqual(stats['hits'], 2)
 
-    def test_06_when_playlist_is_cached_hits_increase(self):
+    def test_05_when_playlist_is_cached_hits_increase(self):
         data = self.caching_client.get_playlist_data('PLn0nrSd4xjjZsAaw5zUHxoRIiPtbQpwoB')
         self.assertIsNotNone(data)
         stats = self.caching_client.stats()
-        self.assertEqual(stats['misses'], 3)
-        self.assertEqual(stats['hits'], 4)
+        self.assertEqual(stats['misses'], 2)
+        self.assertEqual(stats['hits'], 3)
 
 if __name__ == '__main__':
     unittest.main()
