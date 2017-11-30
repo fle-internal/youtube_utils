@@ -43,7 +43,7 @@ class TestCachingClient(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        cls.cache.__exit__()
+        cls.cache.__exit__(None, None, None)
         shutil.rmtree(TestCachingClient.dirname)
 
     def setUp(self):

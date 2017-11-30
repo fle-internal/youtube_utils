@@ -1,10 +1,12 @@
 import shelve2
+from os import makedirs
 from os.path import join
 import hashlib
 from json import dump
 
 class Db:
     def __init__(self, basedir, suffix):
+        self.basedir = basedir
         self.db_path = join(basedir, f'cache-{suffix}')
         self.db = None
         self.hits = 0
@@ -32,10 +34,11 @@ class Db:
         return dict(hits=self.hits, misses=self.misses)
 
     def __enter__(self):
+        makedirs(self.basedir, exist_ok=True)
         self.db = shelve2.open2(self.db_path)
         return self
 
-    def __exit__(self):
+    def __exit__(self, exc_type, exc_value, traceback):
         with open(self.db_path + '.cache_stats.json', 'w') as f:
             dump(self.stats(), f)
         self.db.close()

@@ -10,7 +10,7 @@ class TestCacheDbMethods(unittest.TestCase):
         self.cache = Db(dirname, 'rawcaching').__enter__()
 
     def tearDown(self):
-        self.cache.__exit__()
+        self.cache.__exit__(None, None, None)
 
     def test_add_found(self):
         self.cache.add(key='hola', data=u'mundo!')
